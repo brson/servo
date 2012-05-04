@@ -26,22 +26,30 @@ fn layout(renderer: chan<renderer::msg>) -> chan<msg> {
 
         let r = rand::rng();
 
+
+        let mut j = 0f;
         loop {
 
             let s = scope();
             let ndiv = s.new_node(nk_div);
             let bdiv = base::linked_box(ndiv);
 
-            iter::repeat(100u) {||
-                let node = s.new_node(nk_img(
-                    size(
-                        int_to_au(r.next() as int % 800),
-                        int_to_au(r.next() as int % 200)
-                    )));
+            int::range(0, 100) {|i|
+                let w = float::sin((j + i as float) / 10f) * 300f + 400f;
+
+                let h = float::sin((1f + j * 2f+ i as float) / 10f) * 20f + 40f;
+
+                let size = size(
+                    int_to_au(w as int),
+                    int_to_au(h as int)
+                );
+                let node = s.new_node(nk_img(size));
                 tree::add_child(ndiv, node);
                 let b = base::linked_box(node);
                 tree::add_child(bdiv, b);
             }
+
+            j += 0.1f;
 
             alt recv(po) {
               build {

@@ -23,7 +23,7 @@ fn content(layout: chan<layout::layout::msg>) -> chan<msg> {
             } else {
                 #debug("content: requesting layout");
                 layout.send(layout::layout::build);
-                std::timer::sleep(1000u);
+                std::timer::sleep(100u);
             }
         }
     }
