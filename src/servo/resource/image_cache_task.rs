@@ -34,9 +34,6 @@ enum Msg {
     /// Request an Image object for a URL
     GetImage(url, Chan<ImageResponseMsg>),
 
-    /// For testing
-    /*priv*/ OnMsg(fn~(msg: &Msg)),
-
     /// Clients must wait for a response before shutting down the ResourceTask
     Exit(Chan<()>)
 }
@@ -47,22 +44,26 @@ enum ImageResponseMsg {
 }
 
 type ImageCacheTask = Chan<Msg>;
-
 type DecoderFactory = ~fn() -> ~fn(~[u8]) -> ~Image;
+type MsgIntercept = ~fn(msg: &Msg);
 
 fn image_cache_task(resource_task: ResourceTask) -> ImageCacheTask {
-    image_cache_task_(resource_task, default_decoder_factory)
+    image_cache_task_(resource_task, default_decoder_factory, none)
 }
 
-fn image_cache_task_(resource_task: ResourceTask, +decoder_factory: DecoderFactory) -> ImageCacheTask {
+fn image_cache_task_(resource_task: ResourceTask,
+                     +decoder_factory: DecoderFactory,
+                     +msg_intercept: option<MsgIntercept>) -> ImageCacheTask {
     // FIXME: Doing some dancing to avoid copying decoder_factory, our test
     // version of which contains an uncopyable type which rust will currently
     // copy unsoundly
     let decoder_factory_cell = Cell(move decoder_factory);
-    do spawn_listener |from_client, move decoder_factory_cell| {
+    let msg_intercept_cell = Cell(move msg_intercept);
+    do spawn_listener |from_client, move decoder_factory_cell, move msg_intercept_cell| {
         ImageCache {
             resource_task: resource_task,
             decoder_factory: decoder_factory_cell.take(),
+            msg_intercept: msg_intercept_cell.take(),
             from_client: from_client,
             state_map: url_map(),
             need_exit: none
@@ -75,6 +76,8 @@ struct ImageCache {
     resource_task: ResourceTask;
     /// Creates image decoders
     decoder_factory: DecoderFactory;
+    /// Testing function for monitoring messages
+    msg_intercept: option<fn~(msg: &Msg)>;
     /// The port on which we'll receive client requests
     from_client: Port<Msg>;
     /// The state of processsing an image for a URL
@@ -101,12 +104,13 @@ impl ImageCache {
 
     fn run() {
 
-        let mut msg_handlers: ~[fn~(msg: &Msg)] = ~[];
-
         loop {
             let msg = self.from_client.recv();
 
-            for msg_handlers.each |handler| { handler(&msg) }
+            match self.msg_intercept {
+              some(f) => f(&msg),
+              none => ()
+            }
 
             #debug("image_cache_task: received: %?", msg);
 
@@ -117,7 +121,6 @@ impl ImageCache {
               Decode(url) => self.decode(copy url),
               StoreImage(url, image) => self.store_image(copy url, &image),
               GetImage(url, response) => self.get_image(copy url, response),
-              OnMsg(handler) => msg_handlers += [copy handler],
               Exit(response) => {
                 assert self.need_exit.is_none();
                 self.need_exit = some(response);
@@ -554,18 +557,18 @@ fn should_return_decoded_image_data_if_data_has_arrived() {
         }
     };
 
-    let image_cache_task = image_cache_task(mock_resource_task);
-    let url = make_url(~"file", none);
-
     let wait_for_image = port();
     let wait_for_image_chan = wait_for_image.chan();
 
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
           StoreImage(*) => wait_for_image_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, default_decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
@@ -603,18 +606,18 @@ fn should_return_decoded_image_data_for_multiple_requests() {
         }
     };
 
-    let image_cache_task = image_cache_task(mock_resource_task);
-    let url = make_url(~"file", none);
-
     let wait_for_image = port();
     let wait_for_image_chan = wait_for_image.chan();
 
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
           StoreImage(*) => wait_for_image_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, default_decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
@@ -664,18 +667,18 @@ fn should_not_request_image_from_resource_task_if_image_is_already_available() {
         }
     };
 
-    let image_cache_task = image_cache_task(mock_resource_task);
-    let url = make_url(~"file", none);
-
     let wait_for_image = port();
     let wait_for_image_chan = wait_for_image.chan();
 
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
           StoreImage(*) => wait_for_image_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, default_decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
@@ -786,24 +789,24 @@ fn should_return_not_ready_if_image_bin_cannot_be_fetched() {
         }
     };
 
-    let image_cache_task = image_cache_task(mock_resource_task);
-    let url = make_url(~"file", none);
+    let wait_for_prefetch = port();
+    let wait_for_prefetch_chan = wait_for_prefetch.chan();
 
-    let wait_for_prefetech = port();
-    let wait_for_prefetech_chan = wait_for_prefetech.chan();
-
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
-          StorePrefetchedImageData(*) => wait_for_prefetech_chan.send(()),
+          StorePrefetchedImageData(*) => wait_for_prefetch_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, default_decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
 
     // Wait until our mock resource task has sent the image to the image cache
-    wait_for_prefetech.recv();
+    wait_for_prefetch.recv();
 
     let response_port = port();
     image_cache_task.send(GetImage(url, response_port.chan()));
@@ -836,24 +839,24 @@ fn should_return_not_ready_for_multiple_get_image_requests_if_image_bin_cannot_b
         }
     };
 
-    let image_cache_task = image_cache_task(mock_resource_task);
-    let url = make_url(~"file", none);
+    let wait_for_prefetch = port();
+    let wait_for_prefetch_chan = wait_for_prefetch.chan();
 
-    let wait_for_prefetech = port();
-    let wait_for_prefetech_chan = wait_for_prefetech.chan();
-
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
-          StorePrefetchedImageData(*) => wait_for_prefetech_chan.send(()),
+          StorePrefetchedImageData(*) => wait_for_prefetch_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, default_decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
 
     // Wait until our mock resource task has sent the image to the image cache
-    wait_for_prefetech.recv();
+    wait_for_prefetch.recv();
 
     let response_port = port();
     image_cache_task.send(GetImage(copy url, response_port.chan()));
@@ -905,24 +908,24 @@ fn should_return_not_ready_if_image_is_still_decoding() {
         }
     };
 
-    let image_cache_task = image_cache_task_(mock_resource_task, decoder_factory);
-    let url = make_url(~"file", none);
+    let wait_for_prefetch = port();
+    let wait_for_prefetch_chan = wait_for_prefetch.chan();
 
-    let wait_for_prefetech = port();
-    let wait_for_prefetech_chan = wait_for_prefetech.chan();
-
-    image_cache_task.send(OnMsg(|msg| {
+    let msg_intercept = fn~(msg: &Msg) {
         match *msg {
-          StorePrefetchedImageData(*) => wait_for_prefetech_chan.send(()),
+          StorePrefetchedImageData(*) => wait_for_prefetch_chan.send(()),
           _ => ()
         }
-    }));
+    };
+
+    let image_cache_task = image_cache_task_(mock_resource_task, decoder_factory, some(msg_intercept));
+    let url = make_url(~"file", none);
 
     image_cache_task.send(Prefetch(copy url));
     image_cache_task.send(Decode(copy url));
 
     // Wait until our mock resource task has sent the image to the image cache
-    wait_for_prefetech.recv();
+    wait_for_prefetch.recv();
 
     // Make the request
     let response_port = port();
