@@ -4,6 +4,7 @@ use geom::size::Size2D;
 use gfx::geometry::{au, px_to_au};
 use servo_text::text_run::TextRun;
 use servo_text::font_library::FontLibrary;
+use servo_text::box_slice::BoxSlice;
 use base::{Box, TextBoxKind};
 
 struct TextBox {
@@ -35,7 +36,7 @@ impl @Box : TextLayout {
         let font = flib.get_test_font();
 
         // Do line breaking.
-        let mut current = TextRun(font, subbox.text);
+        let mut current = TextRun(font, BoxSlice(@copy subbox.text));
         let mut lines = dvec::DVec();
         let mut width_left = px_to_au(800);
         let mut max_width = au(0);

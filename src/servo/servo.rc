@@ -96,6 +96,7 @@ mod text {
     export font_library;
     export font;
     export shaper;
+    export box_slice;
 
     mod glyph;
     mod text_run;
@@ -109,6 +110,7 @@ mod text {
         mod ft_native_font;
     }
     mod util;
+    mod box_slice;
 }
 
 mod resource {
