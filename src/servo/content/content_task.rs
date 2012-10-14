@@ -42,6 +42,7 @@ use std::net::url::Url;
 use url_to_str = std::net::url::to_str;
 use util::url::make_url;
 use task::{task, SingleThreaded};
+use std::cell::Cell;
 
 use js::glue::bindgen::RUST_JSVAL_TO_OBJECT;
 use js::JSVAL_NULL;
@@ -60,17 +61,26 @@ pub enum PingMsg {
     PongMsg
 }
 
-pub type ContentTask = Chan<ControlMsg>;
+pub type ContentTask = pipes::Chan<ControlMsg>;
 
 fn ContentTask<S: Compositor Send Copy>(layout_task: LayoutTask,
                                         compositor: S,
                                         resource_task: ResourceTask,
                                         img_cache_task: ImageCacheTask) -> ContentTask {
-    do task().sched_mode(SingleThreaded).spawn_listener::<ControlMsg> |from_master| {
-        let content = Content(layout_task, from_master, resource_task, img_cache_task.clone());
-        compositor.add_event_listener(content.event_port.chan());
+
+    let (content_chan, content_port) = pipes::stream();
+
+    let from_master = Cell(move content_port);
+
+    do task().sched_mode(SingleThreaded).spawn |move from_master| {
+        let (event_chan, event_port) = pipes::stream();
+        let content = Content(layout_task, from_master.take(), resource_task,
+                              img_cache_task.clone(), move event_port);
+        compositor.add_event_listener(move event_chan);
         content.start();
     }
+
+    return content_chan;
 }
 
 struct Content {
@@ -78,8 +88,8 @@ struct Content {
     mut layout_join_port: Option<pipes::Port<()>>,
 
     image_cache_task: ImageCacheTask,
-    from_master: comm::Port<ControlMsg>,
-    event_port: comm::Port<Event>,
+    from_master: pipes::Port<ControlMsg>,
+    event_port: pipes::Port<Event>,
 
     scope: NodeScope,
     jsrt: jsrt,
@@ -96,13 +106,13 @@ struct Content {
 }
 
 fn Content(layout_task: LayoutTask, 
-           from_master: Port<ControlMsg>,
+           from_master: pipes::Port<ControlMsg>,
            resource_task: ResourceTask,
-           img_cache_task: ImageCacheTask) -> @Content {
+           img_cache_task: ImageCacheTask,
+           event_port: pipes::Port<Event>) -> @Content {
 
     let jsrt = jsrt();
     let cx = jsrt.cx();
-    let event_port = Port();
 
     cx.set_default_options_and_version();
     cx.set_logging_error_reporter();
@@ -145,15 +155,15 @@ fn task_from_context(cx: *JSContext) -> *Content unsafe {
 impl Content {
 
     fn start() {
-        while self.handle_msg(select2(self.from_master, self.event_port)) {
-            // Go on...
+        while self.handle_msg() {
+            // Go on ...
         }
     }
 
-    fn handle_msg(msg: Either<ControlMsg,Event>) -> bool {
-        match move msg {
-            Left(move control_msg) => self.handle_control_msg(control_msg),
-            Right(move event) => self.handle_event(event)
+    fn handle_msg() -> bool {
+        match pipes::select2i(&self.from_master, &self.event_port) {
+            either::Left(*) => self.handle_control_msg(self.from_master.recv()),
+            either::Right(*) => self.handle_event(self.event_port.recv())
         }
     }
 
