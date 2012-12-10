@@ -1,0 +1,24 @@
+VPATH=%VPATH%
+
+RUSTC ?= rustc
+RUSTFLAGS ?=
+
+RUST_SRC=$(shell find $(VPATH)/. -type f -name '*.rs')
+
+.PHONY: all
+all: liblmath.dummy
+
+liblmath.dummy: src/lmath.rc $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+	touch $@
+
+lmath-test: src/lmath.rc $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
+
+.PHONY: check
+check: lmath-test
+	./lmath-test
+
+.PHONY: clean
+clean:
+	rm -f *.so *.dylib *.dll *.dummy *-test

@@ -344,7 +344,9 @@ step_msg "running submodule autoconf scripts"
 
 (cd ${CFG_SRC_DIR}src/mozjs/js/src && "${CFG_AUTOCONF213}") || exit $?
 
-CFG_SUBMODULES="libwapcaplet rust-wapcaplet rust-harfbuzz rust-opengles skia rust-azure rust-cairo rust-stb-image rust-geom rust-glut rust-layers rust-http-client libparserutils libhubbub libcss rust-netsurfcss rust-css rust-hubbub sharegl rust-mozjs mozjs"
+CFG_SUBMODULES="libwapcaplet rust-wapcaplet rust-harfbuzz rust-opengles skia rust-azure rust-cairo rust-stb-image rust-geom rust-glut rust-layers rust-http-client libparserutils libhubbub libcss rust-netsurfcss rust-css rust-hubbub sharegl rust-mozjs"
+
+CFG_3RD_PARTY_SUBMODULES="lmath-rs"
 
 if [ $CFG_OSTYPE = "darwin" ]
 then
@@ -360,7 +362,7 @@ step_msg "making build directories"
 
 cd "${CFG_BUILD_DIR}"
 
-for i in ${CFG_SUBMODULES}
+for i in ${CFG_SUBMODULES} ${CFG_3RD_PARTY_SUBMDULES}
 do
     make_dir ${CFG_BUILD_DIR}src/${i}
 done
@@ -395,6 +397,21 @@ do
 		sh ${CONFIGURE_SCRIPT} ${CONFIGURE_ARGS}
     fi
 done
+
+for i in ${CFG_3RD_PARTY_SUBMODULES}
+do
+    if [ -d ${CFG_BUILD_DIR}src/${i} ]
+    then
+        cd ${CFG_BUILD_DIR}src/${i}
+    fi
+    CONFIGURE_SCRIPT="${CFG_SRC_DIR}config/${i}/configure"
+    if [ -f ${CONFIGURE_SCRIPT} ]
+    then
+        sh ${CONFIGURE_SCRIPT} ${CFG_SRC_DIR}src/${i}/ ${CONFIGURE_ARGS}
+    fi
+done
+
+CFG_SUBMODULES="${CFG_SUBMODULES} ${CFG_3RD_PARTY_SUBMODULES}"
 
 step_msg "writing configuration"
 

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CFGDIR="$(cd $(dirname $0) && pwd)"
+SRCDIR=$1
+sed "s#%VPATH%#${SRCDIR}#" ${CFGDIR}/Makefile.in > Makefile

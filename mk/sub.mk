@@ -21,6 +21,7 @@ SLOW_BUILDS += \
 
 DEPS_rust-azure += \
 	rust-geom \
+	lmath-rs \
 	rust-cairo \
 	skia \
 	$(NULL)
@@ -33,12 +34,14 @@ DEPS_rust-layers += \
 	rust-azure \
 	rust-cairo \
 	rust-geom \
+	lmath-rs \
 	rust-glut \
 	rust-opengles \
 	$(NULL)
 
 DEPS_sharegl += \
 	rust-geom \
+	lmath-rs \
 	rust-opengles \
 	$(NULL)
 
