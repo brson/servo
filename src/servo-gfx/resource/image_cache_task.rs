@@ -49,10 +49,10 @@ pub enum ImageResponseMsg {
 
 impl ImageResponseMsg {
     pure fn clone() -> ImageResponseMsg {
-        match self {
-          ImageReady(img) => ImageReady(unsafe { clone_arc(&img) }),
-          ImageNotReady => ImageNotReady,
-          ImageFailed => ImageFailed
+        match &self {
+          &ImageReady(img) => ImageReady(unsafe { clone_arc(&img) }),
+          &ImageNotReady => ImageNotReady,
+          &ImageFailed => ImageFailed
         }
     }
 }

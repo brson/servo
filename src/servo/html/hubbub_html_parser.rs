@@ -220,13 +220,13 @@ pub fn parse_html(scope: NodeScope,
             debug!("create doctype");
             // TODO: remove copying here by using struct pattern matching to 
             // move all ~strs at once (blocked on Rust #3845, #3846, #3847)
-            let public_id = match doctype.public_id {
-                None => None,
-                Some(id) => Some(copy id)
+            let public_id = match &doctype.public_id {
+                &None => None,
+                &Some(copy id) => Some(id)
             };
-            let system_id = match doctype.system_id {
-                None => None,
-                Some(id) => Some(copy id)
+            let system_id = match &doctype.system_id {
+                &None => None,
+                &Some(copy id) => Some(id)
             };
             let data = DoctypeData(copy doctype.name, move public_id, move system_id,
                                    copy doctype.force_quirks);

@@ -148,9 +148,9 @@ fn main() {
 
 #[allow(non_implicitly_copyable_typarams)]
 fn run(opts: &Opts) {
-    match opts.render_mode {
-      Screen => run_pipeline_screen(opts),
-      Png(outfile) => {
+    match &opts.render_mode {
+      &Screen => run_pipeline_screen(opts),
+      &Png(outfile) => {
         assert opts.urls.is_not_empty();
         if opts.urls.len() > 1u {
             fail ~"servo asks that you stick to a single URL in PNG output mode"
