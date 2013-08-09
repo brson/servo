@@ -283,8 +283,8 @@ impl<'self> Element {
     }
 
     fn get_scope_and_cx(&self) -> (*JSObject, *JSContext) {
-        let doc = self.parent.owner_doc.get();
-        let win = doc.with_base(|doc| doc.window.get());
+        let doc = self.parent.owner_doc.unwrap();
+        let win = doc.with_base(|doc| doc.window.unwrap());
         let cx = unsafe {(*win.page).js_info.get_ref().js_compartment.cx.ptr};
         let cache = win.get_wrappercache();
         let scope = cache.get_wrapper();
@@ -408,7 +408,7 @@ impl Element {
                 debug!("no document");
                 None
             }
-        }.get();
+        }.unwrap();
 
         ClientRectList::new(rects, cx, scope)
     }
