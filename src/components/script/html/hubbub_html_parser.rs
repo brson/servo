@@ -267,7 +267,6 @@ fn build_element_from_tag(cx: *JSContext, tag: &str) -> AbstractNode<ScriptView>
     }
 }
 
-#[allow(non_implicitly_copyable_typarams)]
 pub fn parse_html(cx: *JSContext,
                   url: Url,
                   resource_task: ResourceTask,
@@ -474,7 +473,6 @@ pub fn parse_html(cx: *JSContext,
         },
         complete_script: |script| {
             // A little function for holding this lint attr
-            #[allow(non_implicitly_copyable_typarams)]
             fn complete_script(script: hubbub::NodeDataPtr,
                                url: Url,
                                js_chan: SharedChan<JSMessage>) {
