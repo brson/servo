@@ -656,6 +656,7 @@ impl ScriptTask {
             }
         };
         
+        /*
         let mut select_ports = (style_port, iframe_port);
         loop {
             match select_ports.try_select() {
@@ -679,6 +680,8 @@ impl ScriptTask {
                 }
             }
         }
+        */
+        fail!("stubbed out!");
 
         // Receive the JavaScript scripts.
         let js_scripts = js_port.recv();
