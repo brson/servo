@@ -160,7 +160,7 @@ fn css_link_listener(to_parent: Chan<Stylesheet>,
 
     // Send the sheets back in order
     // FIXME: Shouldn't wait until after we've recieved CSSTaskExit to start sending these
-    for result_vec.iter().advance |port| {
+    for port in result_vec.iter() {
         to_parent.send(port.recv());
     }
 }
@@ -340,7 +340,7 @@ pub fn parse_html(cx: *JSContext,
 
             debug!("-- attach attrs");
             do node.as_mut_element |element| {
-                for tag.attributes.iter().advance |attr| {
+                for attr in tag.attributes.iter() {
                     element.attrs.push(Attr::new(attr.name.clone(), attr.value.clone()));
 
                     if "style" == attr.name {
@@ -374,7 +374,7 @@ pub fn parse_html(cx: *JSContext,
                     do node.with_mut_iframe_element |iframe_element| {
                         let elem = &mut iframe_element.parent.parent;
                         let src_opt = elem.get_attr("src").map(|x| x.to_str());
-                        for src_opt.iter().advance |src| {
+                        for src in src_opt.iter() {
                             let iframe_url = make_url(src.clone(), Some(url2.clone()));
                             iframe_element.frame = Some(iframe_url.clone());
                             
@@ -501,7 +501,7 @@ pub fn parse_html(cx: *JSContext,
 
                 let mut data = ~[];
                 debug!("iterating over children %?", style.first_child());
-                for style.children().advance |child| {
+                for child in style.children() {
                     debug!("child = %?", child);
                     do child.with_imm_text() |text| {
                         data.push(text.parent.data.to_str());  // FIXME: Bad copy.
