@@ -385,6 +385,7 @@ pub struct JSNativeHolder {
     propertyHooks: *NativePropertyHooks
 }
 
+#[deriving(Clone)]
 pub enum ConstantVal {
     IntVal(i32),
     UintVal(u32),
@@ -394,6 +395,7 @@ pub enum ConstantVal {
     VoidVal
 }
 
+#[deriving(Clone)]
 pub struct ConstantSpec {
     name: *libc::c_char,
     value: ConstantVal
@@ -846,6 +848,7 @@ impl DerivedWrapper for AbstractNode<ScriptView> {
     }
 }
 
+#[deriving(ToStr)]
 pub enum Error {
     FailureUnknown
 }
