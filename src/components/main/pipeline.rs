@@ -190,6 +190,7 @@ impl Pipeline {
     }
 
     pub fn load(&mut self, url: Url) {
+        info!("loading url: %s", url.to_str());
         self.url = Some(url.clone());
         self.script_chan.send(LoadMsg(self.id, url));
     }

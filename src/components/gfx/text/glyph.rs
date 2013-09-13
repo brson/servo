@@ -538,6 +538,7 @@ impl<'self> GlyphStore {
     }
 
     pub fn add_glyph_for_char_index(&mut self, i: uint, data: &GlyphData) {
+        //error!("--- %u %u", i, self.entry_buffer.len());
         fn glyph_is_compressible(data: &GlyphData) -> bool {
             is_simple_glyph_id(data.index)
                 && is_simple_advance(data.advance)
