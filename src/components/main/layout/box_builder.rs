@@ -304,7 +304,7 @@ impl LayoutTreeBuilder {
 
         let mut reparent = false;
 
-        debug!("result from generator_for_node: {:?}", &box_gen_result);
+        error!("result from generator_for_node: {:?}", &box_gen_result);
         // Skip over nodes that don't belong in the flow tree
         let (this_generator, next_generator) = match box_gen_result {
             NoGenerator => return Normal(prev_sibling_generator),
@@ -385,6 +385,7 @@ impl LayoutTreeBuilder {
                                       parent_generator: &mut BoxGenerator<'a>,
                                       mut sibling_generator: Option<&mut BoxGenerator<'a>>)
                                       -> BoxGenResult<'a> {
+
         let display = match node.type_id() {
             ElementNodeTypeId(_) => match node.style().Box.display {
                 display::none => return NoGenerator,
@@ -396,6 +397,8 @@ impl LayoutTreeBuilder {
             DocumentFragmentNodeTypeId |
             CommentNodeTypeId => return NoGenerator,
         };
+
+        println!("{:?}, {:?}, {:?}", node.type_id(), display, parent_generator.flow.class());
 
         // FIXME(pcwalton): Unsafe.
         let sibling_flow: Option<&mut FlowContext> = sibling_generator.as_mut().map(|gen| {
@@ -465,7 +468,10 @@ impl LayoutTreeBuilder {
             }
 
             // Inlines that are children of inlines are part of the same flow
-            (display::inline, InlineFlowClass, _) => return ParentGenerator,
+            (display::inline, InlineFlowClass, _) => {
+                println!("inline inline case");
+                return ParentGenerator;
+            }
             (display::inline_block, InlineFlowClass, _) => return ParentGenerator,
 
             // Inlines that are children of blocks create new flows if their
@@ -502,6 +508,8 @@ impl LayoutTreeBuilder {
                 match grandparent_generator {
                     None => fail!("expected to have a grandparent block flow"),
                     Some(grandparent_gen) => {
+                        error!("{:?}", grandparent_gen.flow.class());
+                        grandparent_gen.flow.dump();
                         assert!(grandparent_gen.flow.is_block_like());
 
                         let block_gen = self.create_child_generator(node,
@@ -524,6 +532,7 @@ impl LayoutTreeBuilder {
                                   parent_generator: &mut BoxGenerator<'a>,
                                   ty: FlowType)
                                   -> BoxGenerator<'a> {
+        error!("create_child: {:?}, {:?}", node.type_id(), parent_generator.flow.class());
         let new_flow = self.make_flow(ty, node);
         parent_generator.flow.add_new_child(new_flow);
         let flow_ref = flow::last_child(parent_generator.flow).unwrap();
