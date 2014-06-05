@@ -161,11 +161,42 @@ pub extern "C" fn android_start(argc: int, argv: **u8) -> int {
     })
 }
 
+fn spawn_main(opts: opts::Opts,
+              compositor_port: Receiver<compositing::Msg>,
+              profiler_chan: servo_util::time::ProfilerChan,
+              result_port: Receiver<ConstellationChan>,
+              p: proc(): Send) {
+    if !opts.native_threading {
+        let mut pool_config = green::PoolConfig::new();
+        pool_config.event_loop_factory = rustuv::event_loop;
+        let mut pool = green::SchedPool::new(pool_config);
+
+        pool.spawn(TaskOpts::new(), p);
+
+        let constellation_chan = result_port.recv();
+
+        debug!("preparing to enter main loop");
+        CompositorTask::create(opts,
+                               compositor_port,
+                               constellation_chan,
+                               profiler_chan);
+
+        pool.shutdown();
+
+    } else {
+        native::task::spawn(p);
+        let constellation_chan = result_port.recv();
+
+        debug!("preparing to enter main loop");
+        CompositorTask::create(opts,
+                               compositor_port,
+                               constellation_chan,
+                               profiler_chan);
+    }
+}
+
 #[cfg(not(test))]
 pub fn run(opts: opts::Opts) {
-    let mut pool_config = green::PoolConfig::new();
-    pool_config.event_loop_factory = rustuv::event_loop;
-    let mut pool = green::SchedPool::new(pool_config);
 
     let (compositor_port, compositor_chan) = CompositorChan::new();
     let profiler_chan = Profiler::create(opts.profiler_period);
@@ -174,7 +205,7 @@ pub fn run(opts: opts::Opts) {
     let profiler_chan_clone = profiler_chan.clone();
 
     let (result_chan, result_port) = channel();
-    pool.spawn(TaskOpts::new(), proc() {
+    spawn_main(opts.clone(), compositor_port, profiler_chan, result_port, proc() {
         let opts = &opts_clone;
         // Create a Servo instance.
         let resource_task = ResourceTask();
@@ -210,15 +241,5 @@ pub fn run(opts: opts::Opts) {
         // Send the constallation Chan as the result
         result_chan.send(constellation_chan);
     });
-
-    let constellation_chan = result_port.recv();
-
-    debug!("preparing to enter main loop");
-    CompositorTask::create(opts,
-                           compositor_port,
-                           constellation_chan,
-                           profiler_chan);
-
-    pool.shutdown();
 }
 
