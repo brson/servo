@@ -737,6 +737,9 @@ do
             CONFIGURE_ARGS="${CONFIGURE_ARGS} --enable-skia"
             ENABLE_DEBUG="$CFG_ENABLE_DEBUG_SKIA"
             ;;
+	compiler/rust)
+	    CONFIGURE_ARGS="${CONFIGURE_ARGS} --disable-rpath"
+	    ;;
         *)
             ;;
     esac
