@@ -45,7 +45,7 @@ use table_row::TableRowFlow;
 use table_rowgroup::TableRowGroupFlow;
 use table_wrapper::TableWrapperFlow;
 use multicol::MulticolFlow;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect, Size2D};
 use gfx::display_list::ClippingRegion;

@@ -19,7 +19,7 @@ use model::{IntrinsicISizes, IntrinsicISizesContribution, MaybeAuto};
 use table_row::{self, CellIntrinsicInlineSize, CollapsedBorder, CollapsedBorderProvenance};
 use table_row::{TableRowFlow};
 use table_wrapper::TableLayout;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use gfx::display_list::DisplayList;

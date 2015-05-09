@@ -45,7 +45,7 @@ use incremental::{REFLOW, REFLOW_OUT_OF_FLOW};
 use layout_debug;
 use model::{IntrinsicISizes, MarginCollapseInfo};
 use model::{MaybeAuto, CollapsibleMargins, specified, specified_or_none};
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect, Size2D};
 use gfx::display_list::{ClippingRegion, DisplayList};

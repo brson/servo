@@ -12,7 +12,7 @@ use css::node_style::StyledNode;
 use data::{LayoutDataAccess, LayoutDataWrapper};
 use incremental::{self, RestyleDamage};
 use opaque_node::OpaqueNodeMethods;
-use wrapper::{LayoutElement, LayoutNode, TLayoutNode};
+use script::layout_dom::{LayoutElement, LayoutNode, TLayoutNode};
 
 use script::dom::characterdata::CharacterDataTypeId;
 use script::dom::node::NodeTypeId;

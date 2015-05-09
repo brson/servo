@@ -4,7 +4,8 @@
 
 //! Style retrieval from DOM elements.
 
-use wrapper::{PseudoElementType, ThreadSafeLayoutNode};
+use script::layout_dom::{PseudoElementType, ThreadSafeLayoutNode};
+use wrapper::ThreadSafeLayoutNodeExt;
 
 use std::mem;
 use style::properties::ComputedValues;

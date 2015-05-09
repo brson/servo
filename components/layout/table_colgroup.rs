@@ -11,7 +11,7 @@ use css::node_style::StyledNode;
 use flow::{BaseFlow, FlowClass, Flow, ForceNonfloatedFlag};
 use fragment::{Fragment, FragmentBorderBoxIterator, SpecificFragmentInfo};
 use layout_debug;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use util::geometry::{Au, ZERO_RECT};

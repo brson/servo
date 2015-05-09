@@ -16,9 +16,10 @@ use data::{LayoutDataAccess, LayoutDataWrapper};
 use traversal::{BubbleISizes, AssignISizes, AssignBSizesAndStoreOverflow};
 use traversal::{ComputeAbsolutePositions, BuildDisplayList};
 use traversal::{RecalcStyleForNode, ConstructFlows};
-use wrapper::{layout_node_to_unsafe_layout_node, layout_node_from_unsafe_layout_node, LayoutNode};
-use wrapper::{PostorderNodeMutTraversal, UnsafeLayoutNode};
-use wrapper::{PreorderDomTraversal, PostorderDomTraversal};
+use script::layout_dom::{layout_node_to_unsafe_layout_node, layout_node_from_unsafe_layout_node, LayoutNode};
+use script::layout_dom::{PostorderNodeMutTraversal, UnsafeLayoutNode};
+use script::layout_dom::{PreorderDomTraversal, PostorderDomTraversal};
+use wrapper::LayoutNodeExt;
 
 use profile_traits::time::{self, ProfilerMetadata, profile};
 use std::mem;

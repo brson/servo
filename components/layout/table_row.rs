@@ -16,7 +16,7 @@ use layout_debug;
 use table::{ColumnComputedInlineSize, ColumnIntrinsicInlineSize, InternalTable, VecExt};
 use table_cell::{CollapsedBordersForCell, TableCellFlow};
 use model::MaybeAuto;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use cssparser::{Color, RGBA};
 use geom::{Point2D, Rect};

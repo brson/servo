@@ -16,7 +16,7 @@ use model::MaybeAuto;
 use layout_debug;
 use table::InternalTable;
 use table_row::{CollapsedBorder, CollapsedBorderProvenance};
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use cssparser::Color;
 use geom::{Point2D, Rect, SideOffsets2D, Size2D};

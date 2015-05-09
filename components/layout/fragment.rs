@@ -19,7 +19,8 @@ use layout_debug;
 use model::{self, IntrinsicISizes, IntrinsicISizesContribution, MaybeAuto, specified};
 use text;
 use opaque_node::OpaqueNodeMethods;
-use wrapper::{TLayoutNode, ThreadSafeLayoutNode};
+use script::layout_dom::{TLayoutNode, ThreadSafeLayoutNode};
+use wrapper::ThreadSafeLayoutNodeExt;
 
 use geom::{Point2D, Rect, Size2D};
 use gfx::display_list::{BLUR_INFLATION_FACTOR, OpaqueNode};

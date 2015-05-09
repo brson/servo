@@ -13,9 +13,9 @@ use generated_content::ResolveGeneratedContent;
 use traversal::{BubbleISizes, RecalcStyleForNode, ConstructFlows};
 use traversal::{AssignBSizesAndStoreOverflow, AssignISizes};
 use traversal::{ComputeAbsolutePositions, BuildDisplayList};
-use wrapper::LayoutNode;
-use wrapper::{PostorderNodeMutTraversal};
-use wrapper::{PreorderDomTraversal, PostorderDomTraversal};
+use script::layout_dom::LayoutNode;
+use script::layout_dom::{PostorderNodeMutTraversal};
+use script::layout_dom::{PreorderDomTraversal, PostorderDomTraversal};
 
 use geom::point::Point2D;
 use util::geometry::{Au, ZERO_POINT};

@@ -14,7 +14,7 @@ use layout_debug;
 use style::computed_values::{border_collapse, border_spacing};
 use table::{ColumnComputedInlineSize, ColumnIntrinsicInlineSize, InternalTable, TableLikeFlow};
 use table_row::{self, CollapsedBordersForRow};
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use rustc_serialize::{Encoder, Encodable};

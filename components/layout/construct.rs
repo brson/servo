@@ -44,7 +44,8 @@ use table_row::TableRowFlow;
 use table_rowgroup::TableRowGroupFlow;
 use table_wrapper::TableWrapperFlow;
 use text::TextRunScanner;
-use wrapper::{PostorderNodeMutTraversal, PseudoElementType, TLayoutNode, ThreadSafeLayoutNode};
+use script::layout_dom::{PostorderNodeMutTraversal, PseudoElementType, TLayoutNode, ThreadSafeLayoutNode};
+use wrapper::{ThreadSafeLayoutNodeExt, TLayoutNode2};
 
 use gfx::display_list::OpaqueNode;
 use script::dom::characterdata::CharacterDataTypeId;

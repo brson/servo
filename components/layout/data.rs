@@ -13,7 +13,7 @@ use std::cell::{Ref, RefMut};
 use std::mem;
 use std::sync::Arc;
 use style::properties::ComputedValues;
-use wrapper::{LayoutNode, TLayoutNode};
+use script::layout_dom::{LayoutNode, TLayoutNode};
 
 /// Data that layout associates with a node.
 pub struct PrivateLayoutData {

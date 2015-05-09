@@ -23,7 +23,7 @@ use fragment::{Fragment, FragmentBorderBoxIterator};
 use model::MaybeAuto;
 use table::{ColumnComputedInlineSize, ColumnIntrinsicInlineSize};
 use table_row;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use util::geometry::Au;

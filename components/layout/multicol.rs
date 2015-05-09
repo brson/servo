@@ -11,7 +11,7 @@ use context::LayoutContext;
 use floats::FloatKind;
 use flow::{FlowClass, Flow};
 use fragment::{Fragment, FragmentBorderBoxIterator};
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use util::geometry::Au;

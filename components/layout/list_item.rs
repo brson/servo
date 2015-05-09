@@ -17,7 +17,7 @@ use generated_content;
 use incremental::RESOLVE_GENERATED_CONTENT;
 use inline::InlineMetrics;
 use text;
-use wrapper::ThreadSafeLayoutNode;
+use script::layout_dom::ThreadSafeLayoutNode;
 
 use geom::{Point2D, Rect};
 use gfx::display_list::DisplayList;

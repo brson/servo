@@ -71,4 +71,6 @@ mod devtools;
 mod horribly_inefficient_timers;
 mod webdriver_handlers;
 
+pub mod layout_dom;
+
 pub use layout_traits::layout_interface;

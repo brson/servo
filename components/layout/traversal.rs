@@ -15,9 +15,10 @@ use flow::{PreorderFlowTraversal, PostorderFlowTraversal};
 use flow;
 use incremental::{self, BUBBLE_ISIZES, REFLOW, REFLOW_OUT_OF_FLOW, RestyleDamage};
 use layout_traits::layout_interface::ReflowGoal;
-use wrapper::{layout_node_to_unsafe_layout_node, LayoutNode};
-use wrapper::{PostorderNodeMutTraversal, ThreadSafeLayoutNode, UnsafeLayoutNode};
-use wrapper::{PreorderDomTraversal, PostorderDomTraversal};
+use script::layout_dom::{layout_node_to_unsafe_layout_node, LayoutNode};
+use script::layout_dom::{PostorderNodeMutTraversal, ThreadSafeLayoutNode, UnsafeLayoutNode};
+use script::layout_dom::{PreorderDomTraversal, PostorderDomTraversal};
+use wrapper::{LayoutNodeExt, ThreadSafeLayoutNodeExt};
 
 use selectors::bloom::BloomFilter;
 use util::opts;

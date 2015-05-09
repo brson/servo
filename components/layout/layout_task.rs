@@ -21,7 +21,7 @@ use layout_debug;
 use opaque_node::OpaqueNodeMethods;
 use parallel::{self, UnsafeFlow};
 use sequential;
-use wrapper::{LayoutNode, TLayoutNode};
+use script::layout_dom::{LayoutNode, TLayoutNode};
 
 use azure::azure::AzColor;
 use encoding::EncodingRef;
