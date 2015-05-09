@@ -11,7 +11,7 @@ use clock_ticks;
 use gfx::display_list::OpaqueNode;
 use layout_task::{LayoutTask, LayoutTaskData};
 use msg::constellation_msg::{AnimationState, Msg, PipelineId};
-use script::layout_interface::Animation;
+use layout_traits::layout_interface::Animation;
 use script_traits::{ConstellationControlMsg, ScriptControlChan};
 use std::mem;
 use std::sync::mpsc::Sender;

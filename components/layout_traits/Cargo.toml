@@ -7,6 +7,9 @@ authors = ["The Servo Project Developers"]
 name = "layout_traits"
 path = "lib.rs"
 
+[dependencies.geom]
+git = "https://github.com/servo/rust-geom"
+
 [dependencies.gfx]
 path = "../gfx"
 
@@ -22,8 +25,15 @@ path = "../net_traits"
 [dependencies.profile_traits]
 path = "../profile_traits"
 
+[dependencies.style]
+path = "../style"
+
 [dependencies.util]
 path = "../util"
 
+[dependencies.canvas]
+path = "../canvas"
+
 [dependencies]
 url = "0.2.16"
+libc = "*"

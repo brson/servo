@@ -6,23 +6,22 @@
 //! interface helps reduce coupling between these two components, and enables
 //! the DOM to be placed in a separate crate from layout.
 
-use dom::node::LayoutData;
-
 use geom::point::Point2D;
 use geom::rect::Rect;
-use libc::uintptr_t;
+use libc::{uintptr_t, c_void};
 use msg::constellation_msg::{PipelineExitType, WindowSizeData};
 use profile_traits::mem::{Reporter, ReportsChan};
 use script_traits::{ScriptControlChan, OpaqueScriptLayoutChannel, UntrustedNodeAddress};
 use std::any::Any;
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Arc;
 use style::animation::PropertyAnimation;
 use style::media_queries::MediaQueryList;
 use style::stylesheets::Stylesheet;
+use style::properties::ComputedValues;
 use url::Url;
 use util::geometry::Au;
-
-pub use dom::node::TrustedNodeAddress;
+use core::nonzero::NonZero;
 
 /// Asynchronous messages that script can send to layout.
 pub enum Msg {
@@ -62,6 +61,32 @@ pub enum Msg {
     /// this, or layout will crash.
     ExitNow(PipelineExitType),
 }
+
+/// Layout data that is shared between the script and layout tasks.
+pub struct SharedLayoutData {
+    /// The results of CSS styling for this node.
+    pub style: Option<Arc<ComputedValues>>,
+}
+
+/// Encapsulates the abstract layout data.
+pub struct LayoutData {
+    pub chan: Option<LayoutChan>,
+    pub shared_data: SharedLayoutData,
+    pub data: NonZero<*const ()>,
+}
+
+#[allow(unsafe_code)]
+unsafe impl Send for LayoutData {}
+
+/// The address of a node known to be valid. These are sent from script to layout,
+/// and are also used in the HTML parser interface.
+
+#[allow(raw_pointer_derive)]
+#[derive(Clone, PartialEq, Eq, Copy)]
+pub struct TrustedNodeAddress(pub *const c_void);
+
+#[allow(unsafe_code)]
+unsafe impl Send for TrustedNodeAddress {}
 
 /// Synchronous messages that script can send to layout.
 ///

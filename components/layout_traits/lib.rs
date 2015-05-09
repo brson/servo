@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#![feature(box_syntax, core)]
+
+extern crate canvas;
 extern crate gfx;
 extern crate script_traits;
 extern crate msg;
@@ -9,6 +12,10 @@ extern crate profile_traits;
 extern crate net_traits;
 extern crate url;
 extern crate util;
+extern crate style;
+extern crate libc;
+extern crate geom;
+extern crate core;
 
 // This module contains traits in layout used generically
 //   in the rest of Servo.
@@ -25,6 +32,9 @@ use net_traits::image_cache_task::ImageCacheTask;
 use url::Url;
 use script_traits::{ScriptControlChan, OpaqueScriptLayoutChannel};
 use std::sync::mpsc::{Sender, Receiver};
+
+// Script's interface to layout imported from the script crate
+pub mod layout_interface;
 
 /// Messages sent to the layout task from the constellation
 pub enum LayoutControlMsg {
@@ -55,4 +65,26 @@ pub trait LayoutTaskFactory {
               time_profiler_chan: time::ProfilerChan,
               mem_profiler_chan: mem::ProfilerChan,
               shutdown_chan: Sender<()>);
+}
+
+/// Extracted from layout::wrapper
+pub mod dom {
+    use url::Url;
+    use canvas::canvas_msg::CanvasMsg;
+    use std::sync::mpsc::Sender;
+    use msg::constellation_msg::{PipelineId, SubpageId};
+    use style::computed_values::content::ContentItem;
+
+    /// Read-only, thread-safe operations on DOM nodes
+    pub trait ReadOnlyLayoutNode {
+        fn node_is_element(&self) -> bool;
+        fn node_is_document(&self) -> bool;
+        fn image_url(&self) -> Option<Url>;
+        fn get_renderer(&self) -> Option<Sender<CanvasMsg>>;
+        fn get_canvas_width(&self) -> u32;
+        fn get_canvas_height(&self) -> u32;
+        fn iframe_pipeline_and_subpage_ids(&self) -> (PipelineId, SubpageId);
+        fn text_content(&self) -> Vec<ContentItem>;
+        fn first_child(&self) -> Option<Self>;
+    }
 }

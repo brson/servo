@@ -52,6 +52,7 @@ extern crate url;
 extern crate uuid;
 extern crate string_cache;
 extern crate webdriver_traits;
+extern crate layout_traits;
 
 pub mod cors;
 
@@ -60,7 +61,6 @@ pub mod dom;
 
 pub mod parse;
 
-pub mod layout_interface;
 mod network_listener;
 pub mod page;
 pub mod script_task;
@@ -70,3 +70,5 @@ pub mod clipboard_provider;
 mod devtools;
 mod horribly_inefficient_timers;
 mod webdriver_handlers;
+
+pub use layout_traits::layout_interface;

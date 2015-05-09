@@ -46,7 +46,7 @@ use dom::text::Text;
 use dom::virtualmethods::{VirtualMethods, vtable_for};
 use dom::window::{Window, WindowHelpers};
 use geom::rect::Rect;
-use layout_interface::{LayoutChan, Msg};
+use layout_interface::{LayoutChan, Msg, LayoutData, TrustedNodeAddress};
 use devtools_traits::NodeInfo;
 use parse::html::parse_html_fragment;
 use script_traits::UntrustedNodeAddress;
@@ -55,12 +55,10 @@ use util::str::{DOMString, null_str_as_empty};
 use selectors::parser::{Selector, AttrSelector, NamespaceConstraint};
 use selectors::parser::parse_author_origin_selector_list_from_str;
 use selectors::matching::matches;
-use style::properties::ComputedValues;
 use style;
 
 use js::jsapi::{JSContext, JSObject, JSRuntime};
 use js::jsfriendapi;
-use core::nonzero::NonZero;
 use libc;
 use libc::{uintptr_t, c_void};
 use std::borrow::ToOwned;
@@ -68,7 +66,6 @@ use std::cell::{Cell, RefCell, Ref, RefMut};
 use std::default::Default;
 use std::iter::{FilterMap, Peekable};
 use std::mem;
-use std::sync::Arc;
 use uuid;
 use string_cache::{Atom, QualName};
 
@@ -194,22 +191,6 @@ enum SuppressObserver {
     Suppressed,
     Unsuppressed
 }
-
-/// Layout data that is shared between the script and layout tasks.
-pub struct SharedLayoutData {
-    /// The results of CSS styling for this node.
-    pub style: Option<Arc<ComputedValues>>,
-}
-
-/// Encapsulates the abstract layout data.
-pub struct LayoutData {
-    chan: Option<LayoutChan>,
-    _shared_data: SharedLayoutData,
-    _data: NonZero<*const ()>,
-}
-
-#[allow(unsafe_code)]
-unsafe impl Send for LayoutData {}
 
 pub struct LayoutDataRef {
     pub data_cell: RefCell<Option<LayoutData>>,
@@ -2367,16 +2348,6 @@ impl<'a> NodeMethods for JSRef<'a, Node> {
 }
 
 
-
-/// The address of a node known to be valid. These are sent from script to layout,
-/// and are also used in the HTML parser interface.
-
-#[allow(raw_pointer_derive)]
-#[derive(Clone, PartialEq, Eq, Copy)]
-pub struct TrustedNodeAddress(pub *const c_void);
-
-#[allow(unsafe_code)]
-unsafe impl Send for TrustedNodeAddress {}
 
 pub fn document_from_node<T: NodeBase+Reflectable>(derived: JSRef<T>) -> Temporary<Document> {
     let node: JSRef<Node> = NodeCast::from_ref(derived);

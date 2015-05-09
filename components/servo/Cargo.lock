@@ -654,11 +654,15 @@ dependencies = [
 name = "layout_traits"
 version = "0.0.1"
 dependencies = [
+ "canvas 0.0.1",
+ "geom 0.1.0 (git+https://github.com/servo/rust-geom)",
  "gfx 0.0.1",
+ "libc 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "msg 0.0.1",
  "net_traits 0.0.1",
  "profile_traits 0.0.1",
  "script_traits 0.0.1",
+ "style 0.0.1",
  "url 0.2.31 (registry+https://github.com/rust-lang/crates.io-index)",
  "util 0.0.1",
 ]
@@ -1008,6 +1012,7 @@ dependencies = [
  "html5ever 0.0.0 (git+https://github.com/servo/html5ever)",
  "hyper 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "js 0.1.0 (git+https://github.com/servo/rust-mozjs)",
+ "layout_traits 0.0.1",
  "libc 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "msg 0.0.1",
  "net_traits 0.0.1",

@@ -8,8 +8,7 @@ use construct::{ConstructionItem, ConstructionResult};
 use incremental::RestyleDamage;
 use msg::constellation_msg::ConstellationChan;
 use parallel::DomParallelInfo;
-use script::dom::node::SharedLayoutData;
-use script::layout_interface::LayoutChan;
+use layout_traits::layout_interface::{LayoutChan, LayoutData, SharedLayoutData};
 use std::cell::{Ref, RefMut};
 use std::mem;
 use std::sync::Arc;
@@ -98,7 +97,7 @@ impl LayoutDataWrapper {
 #[allow(dead_code)]
 fn static_assertion(x: Option<LayoutDataWrapper>) {
     unsafe {
-        let _: Option<::script::dom::node::LayoutData> =
+        let _: Option<LayoutData> =
             ::std::intrinsics::transmute(x);
     }
 }

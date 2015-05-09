@@ -16,7 +16,7 @@ use wrapper::{LayoutElement, LayoutNode, TLayoutNode};
 
 use script::dom::characterdata::CharacterDataTypeId;
 use script::dom::node::NodeTypeId;
-use script::layout_interface::Animation;
+use layout_traits::layout_interface::Animation;
 use selectors::bloom::BloomFilter;
 use selectors::matching::{CommonStyleAffectingAttributeMode, CommonStyleAffectingAttributes};
 use selectors::matching::{common_style_affecting_attributes, rare_style_affecting_attributes};

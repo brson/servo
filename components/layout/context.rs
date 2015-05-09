@@ -15,7 +15,7 @@ use gfx::font_context::FontContext;
 use msg::constellation_msg::ConstellationChan;
 use net_traits::image::base::Image;
 use net_traits::image_cache_task::{ImageCacheChan, ImageCacheTask, ImageState};
-use script::layout_interface::{Animation, LayoutChan, ReflowGoal};
+use layout_traits::layout_interface::{Animation, LayoutChan, ReflowGoal};
 use std::boxed;
 use std::cell::Cell;
 use std::ptr;
